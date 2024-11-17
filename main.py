@@ -98,6 +98,7 @@ for epoch in range(epochs):
         total_loss += loss.item()
         
         if batch_idx % 10 == 0:  # Print every 10 steps
+            cumulative_time = time.time() - epoch_start_time
             print(f'  Step {batch_idx}/{len(train_loader)}, '
                   f'Time: {epoch_start_time:.2f}s, '
                   f'Loss: {loss.item():.4f}')
@@ -151,13 +152,21 @@ for epoch in range(epochs):
                 all_rouge_scores[key] += batch_rouge_scores[key]
             num_batches += 1
             
-            if batch % 10 == 0:  # Print every 10 steps
+            if batch % 10 == 0:
+                cumulative_time = time.time() - val_start_time
                 print(f'Step {batch}/{len(val_loader)},'
-                  f'Time: {val_start_time:.2f}s, '
+                  f'Time: {cumulative_time:.2f}s, '
                   f'Loss: {loss.item():.4f}, '
                   f'ROUGE-1: {batch_rouge_scores["rouge1"]:.8f}, '
                   f'ROUGE-2: {batch_rouge_scores["rouge2"]:.8f}, '
                   f'ROUGE-L: {batch_rouge_scores["rougeL"]:.8f} ')
+            # if batch % 10 == 0:  # Print every 10 steps
+            #     print(f'Step {batch}/{len(val_loader)},'
+            #       f'Time: {val_start_time:.2f}s, '
+            #       f'Loss: {loss.item():.4f}, '
+            #       f'ROUGE-1: {batch_rouge_scores["rouge1"]:.8f}, '
+            #       f'ROUGE-2: {batch_rouge_scores["rouge2"]:.8f}, '
+            #       f'ROUGE-L: {batch_rouge_scores["rougeL"]:.8f} ')
     
     # Average ROUGE scores
     for key in all_rouge_scores:
