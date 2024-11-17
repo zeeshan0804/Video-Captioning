@@ -2,6 +2,8 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset, random_split
 from torch.optim import AdamW
 import os
+import time
+from datetime import datetime
 from utils import preprocess_data, create_caption_pipeline
 from model import VideoCaptioningModel
 from rouge_score import rouge_scorer
@@ -77,12 +79,15 @@ def calculate_rouge_scores(predictions, targets, tokenizer):
 
 # Training loop
 print('Starting training loop...')
+total_start_time = time.time()
 epochs = 5
 for epoch in range(epochs):
+    epoch_start_time = time.time()
     # Training
     model.train()
     total_loss = 0
-    for batch in train_loader:
+    for batch_idx, batch in enumerate(train_loader):
+        step_start_time = time.time()
         b_input_ids, b_attention_mask, b_labels = [x.to(device) for x in batch]
         
         optimizer.zero_grad()
@@ -91,12 +96,22 @@ for epoch in range(epochs):
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
+        
+        step_time = time.time() - step_start_time
+        if batch_idx % 10 == 0:  # Print every 10 steps
+            print(f'  Step {batch_idx}/{len(train_loader)}, '
+                  f'Time: {step_time:.2f}s, '
+                  f'Loss: {loss.item():.4f}')
     
     avg_train_loss = total_loss/len(train_loader)
-    print(f'Epoch {epoch+1}, Training Loss: {avg_train_loss}')
+    epoch_time = time.time() - epoch_start_time
+    
+    print(f'\nEpoch {epoch+1}:')
+    print(f'  Time: {epoch_time:.2f} seconds')
+    print(f'  Training Loss: {avg_train_loss:.4f}')
     
     # Validation with ROUGE scores
-    model.eval()
+    val_start_time = time.time()
     total_val_loss = 0
     all_rouge_scores = {
         'rouge1': 0.0,
@@ -120,7 +135,11 @@ for epoch in range(epochs):
                 attention_mask=b_attention_mask,
                 max_length=64,
                 num_beams=4,
-                early_stopping=True
+                early_stopping=True,
+                decoder_start_token_id=model.tokenizer.cls_token_id,  
+                bos_token_id=model.tokenizer.cls_token_id,           
+                pad_token_id=model.tokenizer.pad_token_id,          
+                eos_token_id=model.tokenizer.sep_token_id           
             )
             
             # Calculate ROUGE scores
@@ -139,14 +158,15 @@ for epoch in range(epochs):
         all_rouge_scores[key] /= num_batches
     
     avg_val_loss = total_val_loss/len(val_loader)
-    print(f'Epoch {epoch+1}:')
-    print(f'  Training Loss: {avg_train_loss:.4f}')
+    val_time = time.time() - val_start_time
+    print(f'  Validation Time: {val_time:.2f} seconds')
     print(f'  Validation Loss: {avg_val_loss:.4f}')
     print(f'  ROUGE Scores:')
     print(f'    ROUGE-1: {all_rouge_scores["rouge1"]:.4f}')
     print(f'    ROUGE-2: {all_rouge_scores["rouge2"]:.4f}')
-    print(f'    ROUGE-L: {all_rouge_scores["rougeL"]:.4f}\n')
-    
+    print(f'    ROUGE-L: {all_rouge_scores["rougeL"]:.4f}')
+    print(f'  Total Epoch Time: {epoch_time + val_time:.2f} seconds\n')
+
     # Save model checkpoint for each epoch
     checkpoint_path = os.path.join(model_save_dir, f'model_epoch_{epoch+1}.pth')
     torch.save({
@@ -174,6 +194,13 @@ for epoch in range(epochs):
         if patience_counter >= patience:
             print(f'Early stopping triggered after epoch {epoch+1}')
             break
+
+total_time = time.time() - total_start_time
+hours = int(total_time // 3600)
+minutes = int((total_time % 3600) // 60)
+seconds = total_time % 60
+
+print(f'Training completed in {hours}h {minutes}m {seconds:.2f}s')
 
 # Load best model for inference
 best_model_path = os.path.join(model_save_dir, 'best_model.pth')

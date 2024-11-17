@@ -7,6 +7,11 @@ class VideoCaptioningModel(nn.Module):
         super(VideoCaptioningModel, self).__init__()
         self.model = EncoderDecoderModel.from_encoder_decoder_pretrained('bert-base-uncased', 'bert-base-uncased')
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.model.config.bos_token_id = self.tokenizer.cls_token_id
+        self.model.config.eos_token_id = self.tokenizer.sep_token_id
+        self.model.config.pad_token_id = self.tokenizer.pad_token_id
+        self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
+
         
     def forward(self, input_ids, attention_mask, decoder_input_ids=None):
         outputs = self.model(
