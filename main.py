@@ -100,7 +100,7 @@ for epoch in range(epochs):
         if batch_idx % 10 == 0:  # Print every 10 steps
             cumulative_time = time.time() - epoch_start_time
             print(f'  Step {batch_idx}/{len(train_loader)}, '
-                  f'Time: {epoch_start_time:.2f}s, '
+                  f'Time: {cumulative_time:.2f}s, '
                   f'Loss: {loss.item():.4f}')
     
     avg_train_loss = total_loss/len(train_loader)
