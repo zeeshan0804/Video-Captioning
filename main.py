@@ -15,6 +15,7 @@ print(f"Using device: {device}")
 # Initialize ROUGE scorer
 scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
 
+print('Loading and preprocessing data...')
 # Load and preprocess data
 file_path = 'data/Topic Modeling/test.csv'
 df = preprocess_data(file_path)
@@ -75,6 +76,7 @@ def calculate_rouge_scores(predictions, targets, tokenizer):
     return rouge_scores
 
 # Training loop
+print('Starting training loop...')
 epochs = 5
 for epoch in range(epochs):
     # Training
@@ -108,7 +110,7 @@ for epoch in range(epochs):
             b_input_ids, b_attention_mask, b_labels = [x.to(device) for x in batch]
             
             # Get model predictions
-            outputs = model(b_input_ids, b_attention_mask)
+            outputs = model(b_input_ids, b_attention_mask, b_labels)
             loss = criterion(outputs.view(-1, outputs.size(-1)), b_labels.view(-1))
             total_val_loss += loss.item()
             
