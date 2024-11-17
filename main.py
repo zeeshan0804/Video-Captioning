@@ -57,6 +57,8 @@ os.makedirs(model_save_dir, exist_ok=True)
 def calculate_rouge_scores(predictions, targets, tokenizer):
     decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
     decoded_targets = tokenizer.batch_decode(targets, skip_special_tokens=True)
+    print(decoded_preds)
+    print(decoded_targets)
     
     rouge_scores = {
         'rouge1': 0.0,
@@ -132,11 +134,11 @@ for epoch in range(epochs):
             generated_ids = model.model.generate(
                 input_ids=b_input_ids,
                 attention_mask=b_attention_mask,
-                max_length=128,
+                max_length=64,
                 num_beams=4,
-                early_stopping=True
+                ealy_stopping=True
             )
-            
+            print(generated_ids)
             # Calculate ROUGE scores
             batch_rouge_scores = calculate_rouge_scores(
                 generated_ids, 
