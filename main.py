@@ -97,10 +97,9 @@ for epoch in range(epochs):
         optimizer.step()
         total_loss += loss.item()
         
-        step_time = time.time() - step_start_time
         if batch_idx % 10 == 0:  # Print every 10 steps
             print(f'  Step {batch_idx}/{len(train_loader)}, '
-                  f'Time: {step_time:.2f}s, '
+                  f'Time: {epoch_start_time:.2f}s, '
                   f'Loss: {loss.item():.4f}')
     
     avg_train_loss = total_loss/len(train_loader)
@@ -110,7 +109,6 @@ for epoch in range(epochs):
     print(f'  Time: {epoch_time:.2f} seconds')
     print(f'  Training Loss: {avg_train_loss:.4f}')
     
-    # Validation with ROUGE scores
     val_start_time = time.time()
     total_val_loss = 0
     all_rouge_scores = {
