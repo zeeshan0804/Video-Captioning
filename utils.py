@@ -20,7 +20,7 @@ def create_caption_pipeline(df, max_length=128):
         return inputs, labels
     
     encoded_pairs = [tokenize_function(transcript, caption) 
-                    for transcript, caption in zip(df['transcript'], df['caption'])]
+                    for transcript, caption in zip(df['ABSTRACT'], df['TITLE'])]
     
     input_ids = torch.cat([x[0]['input_ids'] for x in encoded_pairs])
     attention_masks = torch.cat([x[0]['attention_mask'] for x in encoded_pairs])

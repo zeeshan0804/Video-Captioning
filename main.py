@@ -1,12 +1,12 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset, random_split
-from transformers import AdamW
+from torch.optim import AdamW
 import os
 from utils import preprocess_data, create_caption_pipeline
 from model import VideoCaptioningModel
 
 # Load and preprocess data
-file_path = 'Video-Captioning/data/test.csv'
+file_path = 'data/Topic Modeling/test.csv'
 df = preprocess_data(file_path)
 input_ids, attention_masks, label_ids = create_caption_pipeline(df)
 
@@ -14,6 +14,11 @@ input_ids, attention_masks, label_ids = create_caption_pipeline(df)
 dataset = TensorDataset(input_ids, attention_masks, label_ids)
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
+
+print(f'\nTotal dataset size: {len(dataset)}')
+print(f'Training set size: {train_size}')
+print(f'Validation set size: {val_size}\n')
+
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False)
@@ -22,7 +27,7 @@ val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False)
 model = VideoCaptioningModel()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
-optimizer = AdamW(model.parameters(), lr=2e-5)
+optimizer = AdamW(model.parameters(), lr=2e-5, weight_decay=0.01)  # Added weight_decay parameter
 criterion = torch.nn.CrossEntropyLoss(ignore_index=model.tokenizer.pad_token_id)
 
 # Early stopping parameters
