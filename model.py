@@ -1,26 +1,29 @@
-from transformers import BertTokenizer, EncoderDecoderModel
+from transformers import BartTokenizer, BartForConditionalGeneration
 import torch
 import torch.nn as nn
 
 class VideoCaptioningModel(nn.Module):
     def __init__(self):
         super(VideoCaptioningModel, self).__init__()
-        self.model = EncoderDecoderModel.from_encoder_decoder_pretrained('bert-base-uncased', 'bert-base-uncased')
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        self.model.config.bos_token_id = self.tokenizer.cls_token_id
-        self.model.config.eos_token_id = self.tokenizer.sep_token_id
-        self.model.config.pad_token_id = self.tokenizer.pad_token_id
-        self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
-
+        self.model = BartForConditionalGeneration.from_pretrained('facebook/bart-base')
+        self.tokenizer = BartTokenizer.from_pretrained('facebook/bart-base')
         
-    def forward(self, input_ids, attention_mask, decoder_input_ids=None):
+        # Configure model parameters
+        self.model.config.max_length = 128
+        self.model.config.min_length = 10
+        self.model.config.no_repeat_ngram_size = 3
+        self.model.config.early_stopping = True
+        self.model.config.length_penalty = 2.0
+        self.model.config.num_beams = 4
+        
+    def forward(self, input_ids, attention_mask, labels=None):
         outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,
-            decoder_input_ids=decoder_input_ids,
+            labels=labels,
             return_dict=True
         )
-        return outputs.logits
+        return outputs.logits if labels is None else outputs
     
     def generate_caption(self, input_ids, attention_mask, max_length=64):
         caption_ids = self.model.generate(

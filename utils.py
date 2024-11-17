@@ -1,6 +1,6 @@
 import pandas as pd
 import torch
-from transformers import BertTokenizer
+from transformers import BartTokenizer
 
 def preprocess_data(file_path):
     df = pd.read_csv(file_path)
@@ -9,7 +9,7 @@ def preprocess_data(file_path):
     return df
 
 def create_caption_pipeline(df, max_length=128):
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = BartTokenizer.from_pretrained('facebook/bart-base')
     
     def tokenize_function(text, target):
         inputs = tokenizer(text, padding='max_length', truncation=True, 

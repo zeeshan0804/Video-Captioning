@@ -132,13 +132,9 @@ for epoch in range(epochs):
             generated_ids = model.model.generate(
                 input_ids=b_input_ids,
                 attention_mask=b_attention_mask,
-                max_length=64,
+                max_length=128,
                 num_beams=4,
-                early_stopping=True,
-                decoder_start_token_id=model.tokenizer.cls_token_id,  
-                bos_token_id=model.tokenizer.cls_token_id,           
-                pad_token_id=model.tokenizer.pad_token_id,          
-                eos_token_id=model.tokenizer.sep_token_id           
+                early_stopping=True
             )
             
             # Calculate ROUGE scores
