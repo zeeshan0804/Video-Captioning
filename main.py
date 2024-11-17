@@ -120,7 +120,7 @@ for epoch in range(epochs):
     num_batches = 0
     
     with torch.no_grad():
-        for batch in val_loader:
+        for batch_idx, batch in enumerate(val_loader):
             b_input_ids, b_attention_mask, b_labels = [x.to(device) for x in batch]
             
             # Get model predictions
@@ -152,9 +152,9 @@ for epoch in range(epochs):
                 all_rouge_scores[key] += batch_rouge_scores[key]
             num_batches += 1
             
-            if batch % 10 == 0:
+            if batch_idx % 10 == 0:
                 cumulative_time = time.time() - val_start_time
-                print(f'Step {batch}/{len(val_loader)},'
+                print(f'Step {batch_idx}/{len(val_loader)},'
                   f'Time: {cumulative_time:.2f}s, '
                   f'Loss: {loss.item():.4f}, '
                   f'ROUGE-1: {batch_rouge_scores["rouge1"]:.8f}, '
