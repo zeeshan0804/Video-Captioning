@@ -38,8 +38,8 @@ print(f'Training set size: {train_size}')
 print(f'Validation set size: {val_size}\n')
 
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
 
 # Initialize model and training
 model = VideoCaptioningModel()
@@ -150,6 +150,14 @@ for epoch in range(epochs):
             for key in all_rouge_scores:
                 all_rouge_scores[key] += batch_rouge_scores[key]
             num_batches += 1
+            
+            if batch % 10 == 0:  # Print every 10 steps
+                print(f'Step {batch}/{len(val_loader)},'
+                  f'Time: {val_start_time:.2f}s, '
+                  f'Loss: {loss.item():.4f}, '
+                  f'ROUGE-1: {batch_rouge_scores["rouge1"]:.8f}, '
+                  f'ROUGE-2: {batch_rouge_scores["rouge2"]:.8f}, '
+                  f'ROUGE-L: {batch_rouge_scores["rougeL"]:.8f} ')
     
     # Average ROUGE scores
     for key in all_rouge_scores:
@@ -160,9 +168,9 @@ for epoch in range(epochs):
     print(f'  Validation Time: {val_time:.2f} seconds')
     print(f'  Validation Loss: {avg_val_loss:.4f}')
     print(f'  ROUGE Scores:')
-    print(f'    ROUGE-1: {all_rouge_scores["rouge1"]:.4f}')
-    print(f'    ROUGE-2: {all_rouge_scores["rouge2"]:.4f}')
-    print(f'    ROUGE-L: {all_rouge_scores["rougeL"]:.4f}')
+    print(f'    ROUGE-1: {all_rouge_scores["rouge1"]:.8f}')
+    print(f'    ROUGE-2: {all_rouge_scores["rouge2"]:.8f}')
+    print(f'    ROUGE-L: {all_rouge_scores["rougeL"]:.8f}')
     print(f'  Total Epoch Time: {epoch_time + val_time:.2f} seconds\n')
 
     # Save model checkpoint for each epoch
