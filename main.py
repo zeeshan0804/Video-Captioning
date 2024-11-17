@@ -80,7 +80,7 @@ def calculate_rouge_scores(predictions, targets, tokenizer):
 # Training loop
 print('Starting training loop...')
 total_start_time = time.time()
-epochs = 5
+epochs = 15
 for epoch in range(epochs):
     epoch_start_time = time.time()
     # Training
@@ -195,6 +195,7 @@ for epoch in range(epochs):
             'train_loss': avg_train_loss,
             'val_loss': avg_val_loss,
         }, os.path.join(model_save_dir, 'best_model.pth'))
+        print(f'New best model saved with validation loss: {avg_val_loss:.4f}')
     else:
         patience_counter += 1
         if patience_counter >= patience:
