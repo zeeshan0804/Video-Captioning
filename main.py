@@ -132,10 +132,7 @@ for epoch in range(epochs):
             # Generate captions for ROUGE calculation
             generated_ids = model.model.generate(
                 input_ids=b_input_ids,
-                attention_mask=b_attention_mask,
-                max_length=64,
-                num_beams=4,
-                ealy_stopping=True
+                attention_mask=b_attention_mask
             )
             print(generated_ids)
             # Calculate ROUGE scores

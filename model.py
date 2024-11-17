@@ -25,7 +25,7 @@ class VideoCaptioningModel(nn.Module):
         )
         return outputs  # Return full output object
     
-    def generate_caption(self, input_ids, attention_mask, max_length=64):
+    def generate_caption(self, input_ids, attention_mask, max_length=128):
         caption_ids = self.model.generate(
             input_ids=input_ids,
             attention_mask=attention_mask,
