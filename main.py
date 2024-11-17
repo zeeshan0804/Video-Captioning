@@ -89,12 +89,11 @@ for epoch in range(epochs):
     model.train()
     total_loss = 0
     for batch_idx, batch in enumerate(train_loader):
-        step_start_time = time.time()
         b_input_ids, b_attention_mask, b_labels = [x.to(device) for x in batch]
         
         optimizer.zero_grad()
         outputs = model(b_input_ids, b_attention_mask, b_labels)
-        loss = criterion(outputs.view(-1, outputs.size(-1)), b_labels.view(-1))
+        loss = outputs.loss  # Use the loss directly from BART output
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
@@ -127,7 +126,7 @@ for epoch in range(epochs):
             
             # Get model predictions
             outputs = model(b_input_ids, b_attention_mask, b_labels)
-            loss = criterion(outputs.view(-1, outputs.size(-1)), b_labels.view(-1))
+            loss = outputs.loss  # Use the loss directly from BART output
             total_val_loss += loss.item()
             
             # Generate captions for ROUGE calculation

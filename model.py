@@ -23,7 +23,7 @@ class VideoCaptioningModel(nn.Module):
             labels=labels,
             return_dict=True
         )
-        return outputs.logits if labels is None else outputs
+        return outputs  # Return full output object
     
     def generate_caption(self, input_ids, attention_mask, max_length=64):
         caption_ids = self.model.generate(
