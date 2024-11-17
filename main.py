@@ -19,7 +19,7 @@ scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=Tr
 
 print('Loading and preprocessing data...')
 # Load and preprocess data
-file_path = 'data/Topic Modeling/test.csv'
+file_path = 'data/Topic Modeling/train.csv'
 df = preprocess_data(file_path)
 input_ids, attention_masks, label_ids = create_caption_pipeline(df)
 
@@ -57,8 +57,8 @@ os.makedirs(model_save_dir, exist_ok=True)
 def calculate_rouge_scores(predictions, targets, tokenizer):
     decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
     decoded_targets = tokenizer.batch_decode(targets, skip_special_tokens=True)
-    print(decoded_preds)
-    print(decoded_targets)
+    # print(decoded_preds)
+    # print(decoded_targets)
     
     rouge_scores = {
         'rouge1': 0.0,
@@ -178,13 +178,14 @@ for epoch in range(epochs):
 
     # Save model checkpoint for each epoch
     checkpoint_path = os.path.join(model_save_dir, f'model_epoch_{epoch+1}.pth')
+    model_path = f'model_epoch_{epoch+1}.pth'
     torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'train_loss': avg_train_loss,
         'val_loss': avg_val_loss,
-    }, checkpoint_path)
+    }, model_path)
     
     # Early stopping
     if avg_val_loss < best_val_loss:
@@ -197,7 +198,7 @@ for epoch in range(epochs):
             'optimizer_state_dict': optimizer.state_dict(),
             'train_loss': avg_train_loss,
             'val_loss': avg_val_loss,
-        }, os.path.join(model_save_dir, 'best_model.pth'))
+        }, 'best_model.pth')
         print(f'New best model saved with validation loss: {avg_val_loss:.4f}')
     else:
         patience_counter += 1
