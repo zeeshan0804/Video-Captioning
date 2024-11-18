@@ -134,7 +134,7 @@ for epoch in range(epochs):
                 input_ids=b_input_ids,
                 attention_mask=b_attention_mask
             )
-            print(generated_ids)
+            # print(generated_ids)
             # Calculate ROUGE scores
             batch_rouge_scores = calculate_rouge_scores(
                 generated_ids, 
